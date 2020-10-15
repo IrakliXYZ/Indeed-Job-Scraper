@@ -11,7 +11,6 @@ def extract_indeed_pages():
 
   pagination = soup.find("div", {"class": "pagination"})
 
-
   links = pagination.find_all('a')
 
   pages = []
@@ -34,7 +33,18 @@ def extract_indeed_jobs(last_page):
 
     for result in results:
       title = result.find("a", {"class": "jobtitle"})["title"]
+      company = result.find("span", {"class": "company"})
 
-      print(title)
+      company_anchor = company.find("a")
+
+      if company_anchor is not None:
+        company = (company_anchor.string.strip())
+      else:
+        company = (company.string.strip())
+
+      #company = company.strip()
+
+      print(title, company)
+      
 
   return jobs
