@@ -22,6 +22,20 @@ def extract_indeed_pages():
   return max_pages
 
 
+def extraction(result):
+  title = result.find("a", {"class": "jobtitle"})["title"]
+
+  company = result.find("span", {"class": "company"})
+  company_anchor = company.find("a")
+
+  if company_anchor is not None:
+    company = (company_anchor.string.strip())
+  else:
+    company = (company.string.strip())
+
+  return {"title": title, "company": company}
+  
+
 def extract_indeed_jobs(last_page):
   jobs = []
   for page in range(last_page):
@@ -32,19 +46,8 @@ def extract_indeed_jobs(last_page):
     results = soup.find_all("div", {"class": "jobsearch-SerpJobCard"})
 
     for result in results:
-      title = result.find("a", {"class": "jobtitle"})["title"]
-      company = result.find("span", {"class": "company"})
-
-      company_anchor = company.find("a")
-
-      if company_anchor is not None:
-        company = (company_anchor.string.strip())
-      else:
-        company = (company.string.strip())
-
-      #company = company.strip()
-
-      print(title, company)
+      extraction_results = extraction(result)
+      print(extraction_results)
       
 
   return jobs
