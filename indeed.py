@@ -39,7 +39,9 @@ def extraction(result):
 
     location = result.find("div", {"class": "recJobLoc"})["data-rc-loc"]
 
-    return {"title": title, "company": company, "location": location}
+    link_id = result["data-jk"]
+    
+    return {"title": title, "company": company, "location": location, "link": f"https://www.indeed.com/viewjob?jk={link_id}"}
 
 
 def extract_indeed_jobs(last_page):
