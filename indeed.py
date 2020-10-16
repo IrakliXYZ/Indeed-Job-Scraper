@@ -34,14 +34,16 @@ def extraction(result):
     else:
         company = (company.string.strip())
 
-    #gives a problem in the last result
-    #location = result.find("span", {"class": "location"}).string
-
     location = result.find("div", {"class": "recJobLoc"})["data-rc-loc"]
 
     link_id = result["data-jk"]
-    
-    return {"title": title, "company": company, "location": location, "link": f"https://www.indeed.com/viewjob?jk={link_id}"}
+
+    return {
+        "title": title,
+        "company": company,
+        "location": location,
+        "link": f"https://www.indeed.com/viewjob?jk={link_id}"
+    }
 
 
 def extract_indeed_jobs(last_page):
