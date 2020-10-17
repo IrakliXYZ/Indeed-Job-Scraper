@@ -4,50 +4,45 @@ from bs4 import BeautifulSoup
 LIMIT = 50
 URL = f"https://www.indeed.com/jobs?as_and=Python+Developer+Intern&as_phr=&as_any=&as_not=&as_ttl=&as_cmp=&jt=all&st=&salary=&radius=25&l=&fromage=any&limit={LIMIT}&sort=date&psf=advsrch&from=advancedsearch"
 
+def get_last_page() -> int:
+    response = requests.get(URL)
 
-def get_last_page():
-    results = requests.get(URL)
-
-    soup = BeautifulSoup(results.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
     pagination = soup.find("div", {"class": "pagination"})
 
     links = pagination.find_all('a')
 
-    pages = []
-
-    for link in links[0:-1]:
-        pages.append(int(link.string))
-
-    max_pages = pages[-1]
-    return max_pages
+    pages = [int(link.string) for link in links[0:-1]]
+    return pages[-1]
 
 
-def extraction(result):
+def extraction(result: object) -> dict:
     title = result.find("a", {"class": "jobtitle"})["title"]
 
     company = result.find("span", {"class": "company"})
     company_anchor = company.find("a")
 
-    if company_anchor is not None:
-        company = (company_anchor.string.strip())
-    else:
-        company = (company.string.strip())
+    if company_anchor:
+        company = company_anchor.string.strip() 
+    else: 
+        company = company.string.strip()
 
     location = result.find("div", {"class": "recJobLoc"})["data-rc-loc"]
 
     link_id = result["data-jk"]
 
     return {
-        "title": title,
-        "company": company,
-        "location": location,
-        "link": f"https://www.indeed.com/viewjob?jk={link_id}"
+        'title'     : title,
+        'company'   : company,
+        'location'  : location,
+        'link'      : f'https://www.indeed.com/viewjob?jk={link_id}'
     }
 
 
-def extract_jobs(last_page):
+def extract_jobs(last_page: int) -> list:
     jobs = []
+
     for page in range(last_page):
         print(f"Scraping page #{page}")
 
@@ -56,15 +51,11 @@ def extract_jobs(last_page):
         soup = BeautifulSoup(result.text, "html.parser")
 
         results = soup.find_all("div", {"class": "jobsearch-SerpJobCard"})
-
-        for result in results:
-            extraction_results = extraction(result)
-            jobs.append(extraction_results)
-
+        jobs += [extraction(result) for result in results]
+        
     return jobs
 
 
-def get_jobs():
+def get_jobs() -> list:
     last_page = get_last_page()
-    jobs = extract_jobs(last_page)
-    return jobs
+    return extract_jobs(last_page)
