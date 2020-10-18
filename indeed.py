@@ -10,9 +10,7 @@ def get_last_page():
     soup = BeautifulSoup(results.text, "html.parser")
     pagination = soup.find("div", {"class": "pagination"})
     links = pagination.find_all('a')
-    # pages = [int(link.string) for link in links[:-1]]
     return int(links[-2].string)
-    # return pages[-1]
 
 
 def extraction(result):
