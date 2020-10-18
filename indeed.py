@@ -7,37 +7,26 @@ URL = f"https://www.indeed.com/jobs?as_and=Python+Developer+Intern&as_phr=&as_an
 
 def get_last_page():
     results = requests.get(URL)
-
     soup = BeautifulSoup(results.text, "html.parser")
-
     pagination = soup.find("div", {"class": "pagination"})
-
     links = pagination.find_all('a')
-
-    pages = []
-
-    for link in links[0:-1]:
-        pages.append(int(link.string))
-
-    max_pages = pages[-1]
-    return max_pages
+    # pages = [int(link.string) for link in links[:-1]]
+    return int(links[-2].string)
+    # return pages[-1]
 
 
 def extraction(result):
     title = result.find("a", {"class": "jobtitle"})["title"]
-
     company = result.find("span", {"class": "company"})
     company_anchor = company.find("a")
-
+    
     if company_anchor is not None:
         company = (company_anchor.string.strip())
     else:
         company = (company.string.strip())
 
     location = result.find("div", {"class": "recJobLoc"})["data-rc-loc"]
-
     link_id = result["data-jk"]
-
     return {
         "title": title,
         "company": company,
@@ -48,13 +37,11 @@ def extraction(result):
 
 def extract_jobs(last_page):
     jobs = []
+    
     for page in range(last_page):
         print(f"Scraping page #{page}")
-
         result = requests.get(f"{URL}&start={page*LIMIT}")
-
         soup = BeautifulSoup(result.text, "html.parser")
-
         results = soup.find_all("div", {"class": "jobsearch-SerpJobCard"})
 
         for result in results:
